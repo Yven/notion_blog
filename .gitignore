@@ -1,0 +1,9 @@
+runner
+.env
+
+/template/
+/logs/
+/dist/
+
+/.idea/
+/.vscode/
