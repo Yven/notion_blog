@@ -50,6 +50,12 @@ docker build . --tag notion_blog
 docker run -d --name notion_blog notion_blog
 ```
 
+**使用 Docker Compose 运行**
+```shell
+# 如果要连接到其他 docker-compose 项目中的数据库，注意对应修改 network 名称
+docker-compose up -d
+```
+
 ## TO DO
 ### Must
 - [x] 重写 filter 调用方法
