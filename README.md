@@ -1,6 +1,8 @@
 <div align="center">
 
-# Notion blog API
+# Notion Blog
+[![Build Status](https://img.shields.io/badge/notoin_blog-1.0-69cafd)](https://github.com/Yven/notion_blog)
+
 调用Notion API获取内容，导入到Typecho的文章数据库中，或导出页面为`.md`文件
 
 </div>
@@ -12,37 +14,37 @@
 - [x] 使用Docker运行
 - [x] 使用命令行调用
 - [ ] 输出页面为HTML
-
-## 安装
+- [ ] notion 库
 
 ## 使用
-### 1.复制并修改配置文件
-```shell
-cp env.example .env
-```
+### 1.配置参数
 
-1. 参考[官方文档](https://developers.notion.com/docs/create-a-notion-integration)创建integration并获取Token，然后填入key中
-2. 在你的文章Database中点击share然后copy link获取链接中的database_id，如此形式：`https://www.notion.so/{name}/{database_id}?v={view_id}`
-3. 填写你的Typecho数据库配置
-
-```
-# 填入Notion Integration Token
-NOTION_KEY=
-# 填入database id
-NOTION_DB_ID=
-
-# 以下为Typecho数据库的配置
-BLOG_DB_HOST=
-BLOG_DB_USER=
-BLOG_DB_PASSWORD=
-BLOG_DB_NAME=
-BLOG_DB_CHARSET=
-```
+1. 复制 `.env` 文件
+    ```shell
+    cp env.example .env
+    ```
+2. 参考[官方文档](https://developers.notion.com/docs/create-a-notion-integration)创建 integration 并获取 Token，然后填入下面的 `NOTION_KEY` 中
+3. 在你的文章 Database 中点击 share 然后 copy link 获取链接中的 `database_id`，如此形式：`https://www.notion.so/{name}/{database_id}?v={view_id}`
+    ```
+    # 填入Notion Integration Token
+    NOTION_KEY=
+    # 填入database id
+    NOTION_DB_ID=
+    ```
+4. 填写你的 Typecho 数据库配置（如果需要，或导出为 md 文件）
+    ```
+    # 以下为Typecho数据库的配置
+    BLOG_DB_HOST=
+    BLOG_DB_USER=
+    BLOG_DB_PASSWORD=
+    BLOG_DB_NAME=
+    BLOG_DB_CHARSET=
+    ```
+5. 默认将在每天早上 09:41 运行一次，可以在 `./crontab` 文件中添加或修改定时任务
 
 ### 2.运行
 
-
-**使用Docker构建项目**
+**使用 Docker**
 
 ```shell
 docker build . --tag notion_blog 
@@ -50,11 +52,33 @@ docker build . --tag notion_blog
 docker run -d --name notion_blog notion_blog
 ```
 
-**使用 Docker Compose 运行**
+**使用 Docker Compose**
+
 ```shell
 # 如果要连接到其他 docker-compose 项目中的数据库，注意对应修改 network 名称
 docker-compose up -d
 ```
+
+**直接运行**
+
+```shell
+# 编译
+go build main.go runner
+# 运行
+chmod +X ./runner
+
+# 参数：
+# -l 日志目录
+# -c 配置文件
+./runner -l ./logs -c .env
+```
+
+## 开发
+
+1. 在 `./plugin` 目录中新建子目录
+2. 实现 `./notion/adapter.go` 中定义的接口 `ListWriter`
+3. 在 `main.go` 中调用
+
 
 ## TO DO
 ### Must
