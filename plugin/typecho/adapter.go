@@ -17,17 +17,23 @@ type Typecho struct {
 	Meta    []*Metas
 }
 
-func NewDb(host string, port string, user string, passwd string, database string, charset string) *Typecho {
-	if len(host) == 0 || len(port) == 0 || len(user) == 0 || len(passwd) == 0 || len(database) == 0 || len(charset) == 0 {
-		log.Fatalln("数据库连接参数为空")
-	}
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local", user, passwd, host, port, database, charset)
+type DbOptions struct {
+	Host     string
+	Port     string
+	User     string
+	Passwd   string
+	Database string
+	Charset  string
+}
+
+func NewDb(opt DbOptions) *Typecho {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local", opt.User, opt.Passwd, opt.Host, opt.Port, opt.Database, opt.Charset)
 	// dsn := "root:123456@tcp(127.0.0.1:3306)/typecho?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{TablePrefix: "typecho_", SingularTable: false},
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("数据库连接失败：%s", err)
 	}
 
 	return &Typecho{Db: db}
@@ -83,7 +89,7 @@ func (c *Typecho) Writer(list *notion.List) error {
 		}
 
 		// 查询是否存在绑定关系
-		if relatRes := tx.Where(Relationships{Cid: c.Content.Cid, Mid: existMeta.Mid}).First(&Relationships{}); relatRes.Error == nil || errors.Is(relatRes.Error, gorm.ErrRecordNotFound) {
+		if relatRes := tx.Where(Relationships{Cid: c.Content.Cid, Mid: meta.Mid}).First(&Relationships{}); relatRes.Error == nil || errors.Is(relatRes.Error, gorm.ErrRecordNotFound) {
 			if relatRes.RowsAffected == 0 {
 				// 新增关联关系
 				if res := tx.Create(Relationships{Cid: c.Content.Cid, Mid: meta.Mid}); res.Error != nil {

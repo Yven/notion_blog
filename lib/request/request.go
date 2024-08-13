@@ -41,10 +41,10 @@ func Notion(method Method, path string, data io.Reader) (rs []byte, err error) {
 		return []byte{}, fmt.Errorf("Notion Key 配置为空")
 	}
 
-	return Request(method, apiURL, path, header, data)
+	return Request(method, apiURL, header, data)
 }
 
-func Request(method Method, apiURL string, path string, header map[string]string, data io.Reader) (rs []byte, err error) {
+func Request(method Method, apiURL string, header map[string]string, data io.Reader) (rs []byte, err error) {
 	var Url *url.URL
 	Url, err = url.Parse(apiURL)
 	if err != nil {

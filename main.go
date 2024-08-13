@@ -79,14 +79,14 @@ func main() {
 			outputPath := os.Getenv("NOTION_PAGE_PATH")
 			outputHandle = file.NewFile(outputPath, outputStructType)
 		} else if outputType == "typecho" {
-			outputHandle = typecho.NewDb(
-				os.Getenv("BLOG_DB_HOST"),
-				os.Getenv("BLOG_DB_PORT"),
-				os.Getenv("BLOG_DB_USER"),
-				os.Getenv("BLOG_DB_PASSWORD"),
-				os.Getenv("BLOG_DB_NAME"),
-				os.Getenv("BLOG_DB_CHARSET"),
-			)
+			outputHandle = typecho.NewDb(typecho.DbOptions{
+				Host:     os.Getenv("BLOG_DB_HOST"),
+				Port:     os.Getenv("BLOG_DB_PORT"),
+				User:     os.Getenv("BLOG_DB_USER"),
+				Passwd:   os.Getenv("BLOG_DB_PASSWORD"),
+				Database: os.Getenv("BLOG_DB_NAME"),
+				Charset:  os.Getenv("BLOG_DB_CHARSET"),
+			})
 		} else {
 			log.Panicln("输出模式设置错误")
 		}

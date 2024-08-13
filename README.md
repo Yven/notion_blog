@@ -64,12 +64,13 @@ docker-compose up -d
 ```shell
 # 编译
 go build main.go runner
-# 运行
+# 添加权限
 chmod +X ./runner
 
 # 参数：
 # -l 日志目录
 # -c 配置文件
+# 运行
 ./runner -l ./logs -c .env
 ```
 
@@ -84,7 +85,7 @@ chmod +X ./runner
 ### Must
 - [x] 重写 filter 调用方法
 - [x] 写入到数据库可能出现的重复录入问题
-- [ ] 录入完成修改 notion 中的状态
+- [x] 录入完成修改 notion 中的状态
 - [ ] request 方法，是否需要创建一个 struct，避免每次请求都需要读取配置
 - [ ] 图片处理方式
 - [ ] plugin 开发方式
