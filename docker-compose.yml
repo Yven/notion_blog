@@ -7,9 +7,9 @@ services:
       - "./logs:/logs"
     restart: always
     networks:
-      - nb_default
+      - dnmp_default
 
 # 如果需要连接其他项目的服务，请将 dnmp_default 添加到其他项目的 networks 中
 networks:
-  nb_default:
-    driver: bridge
+  dnmp_default:
+    external: true
