@@ -3,6 +3,8 @@ services:
     build:
       context: .
     container_name: notion_blog
+    volumes:
+      - "./logs:/logs"
     restart: always
     networks:
       - dnmp_default

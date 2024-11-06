@@ -1,8 +1,9 @@
 runner
+main
 .env
+*.log
 
 /template/
-/logs/
 /dist/
 
 /.idea/
