@@ -1,16 +1,12 @@
 package lib
 
 import (
-	"encoding/base64"
-	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
-
-	"github.com/gabriel-vasile/mimetype"
 )
 
 func WriteFile(filename string, data []byte) {
@@ -60,27 +56,23 @@ func Contain[T comparable](arr []T, target T) bool {
 	return false
 }
 
-func DownloadFile(fileUrl string) string {
+func DownloadFile(fileUrl string) ([]byte, error) {
 	var Url *url.URL
 	Url, err := url.Parse(fileUrl)
 	if err != nil {
-		log.Fatalf("解析url错误:%v", err)
-	}
-
-	arr := []string{"jpg", "jpeg", "png", "svg", "bmp", "gif", "tif", "tiff", "heic"}
-	ext := path.Ext(Url.Path)
-	if !Contain(arr, ext[1:]) {
-		return fileUrl
+		return nil, err
 	}
 
 	res, err := http.Get(Url.String())
-	defer res.Body.Close()
-	file, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatalf("下载失败:%v", err)
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	file, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
 	}
 
-	mtype := mimetype.Detect(file)
-
-	return fmt.Sprintf("data:%s;base64,%s", mtype.String(), base64.StdEncoding.EncodeToString(file))
+	return file, nil
 }
