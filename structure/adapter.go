@@ -1,4 +1,4 @@
-package notion
+package structure
 
 type DbAdapter interface {
 	Writer(list *List) error

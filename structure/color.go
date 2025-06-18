@@ -1,4 +1,4 @@
-package notion
+package structure
 
 type AnnotationColor string
 

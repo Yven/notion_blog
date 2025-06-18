@@ -7,12 +7,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/Yven/notion_blog/client"
+	"github.com/Yven/notion_blog/filter"
+	"github.com/Yven/notion_blog/plugin/file"
+	"github.com/Yven/notion_blog/plugin/typecho"
+	"github.com/Yven/notion_blog/structure"
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli"
-	"notion_blog/filter"
-	"notion_blog/notion"
-	"notion_blog/plugin/file"
-	"notion_blog/plugin/typecho"
 )
 
 func main() {
@@ -73,7 +74,7 @@ func main() {
 		}
 
 		// 设置输出 Blog 模式
-		var outputHandle notion.ListWriter = nil
+		var outputHandle structure.ListWriter = nil
 		outputType := os.Getenv("BLOG_OUTPUT_TYPE")
 		if outputType == "file" {
 			outputPath := os.Getenv("NOTION_PAGE_PATH")
@@ -101,35 +102,37 @@ func main() {
 		}
 
 		// 设置请求 Notion 数据库筛选条件
-		condition := filter.Status("Status").Equal("waiting").SetFilter()
-		// .And(filter.MultiSelect("Tag").Contain("test"))
-		// fmt.Println(filter.StringIndent())
+		// condition := filter.Status("Status").Equal("waiting").
+		// 	And(filter.MultiSelect("Tag").Contain("test"))
 		// 发起请求
-		list := notion.NewNotionDb(databaseId, condition)
+		notion := client.NewClient(os.Getenv("NOTION_API_KEY"))
+		list, err := notion.NewDb(databaseId).Query(client.QueryDatabase{
+			Filter: filter.Status("Status").Equal("edit"),
+		})
+		// list := client.NewDb(databaseId, &structure.DatabaseList{
+		// 	FilterParam: condition,
+		// })
+
 		if list == nil {
 			return nil
 		}
 
-		// 文章完成状态的请求参数
-		body := filter.NewNormalFilter("properties",
-			filter.NewNormalFilter("Status",
-				filter.NewNormalFilter(string(filter.ObjectTypeStatus),
-					filter.NewNormalFilter("name", "publish"),
-				),
-			),
-		)
-		// fmt.Println(body.StringIndent())
-
 		// 遍历结果
 		for _, page := range list.GetContent() {
 			// 获取每页的具体内容数据
-			pageContent := page.Fetch()
+			// pageContent := page.Fetch(client)
+			pageContent, err := notion.NewBlock(page.Id).Children(page, client.BaseQuery{})
+			if err != nil {
+				log.Panicln(err)
+			}
 			// 设置输出格式
 			pageContent.SetOutputType(outputStructType)
 			// 输出
 			outputHandle.Writer(pageContent)
 			// 修改文章属性为已完成
-			pageContent.PageUpdate(body)
+			notion.NewPage(page.Id).Update(client.UpdatePage{
+				Properties: filter.Status("Status").Set("name", "publish"),
+			})
 
 			// data, _ := json.Marshal(blockObj)
 			// lib.WriteFile("output-block-rever.json", data)
