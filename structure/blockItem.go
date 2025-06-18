@@ -1,10 +1,8 @@
-package notion
+package structure
 
 import (
 	"fmt"
 	"strings"
-
-	"notion_blog/lib"
 )
 
 type FileType string
@@ -116,7 +114,8 @@ func (obj *Callout) GetStatus() string {
 	if len(obj.Icon.Emoji) != 0 {
 		return obj.Icon.Emoji
 	} else if len(obj.Icon.Url) != 0 {
-		return lib.DownloadFile(obj.Icon.Url)
+		return obj.Icon.Url
+		// return lib.DownloadFile(obj.Icon.Url)
 	} else {
 		return ""
 	}
@@ -176,7 +175,10 @@ type FileObject struct {
 func (file *FileObject) GetFile() string {
 	switch file.Type {
 	case FileTypeFile:
-		return lib.DownloadFile(file.File.Url)
+		return file.File.Url
+		// fileStream, err := lib.DownloadFile(file.File.Url)
+		// if err != nil {
+		// }
 	case FileTypeExternal:
 		return file.External.Url
 	default:

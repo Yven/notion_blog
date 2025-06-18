@@ -1,8 +1,7 @@
-package notion
+package structure
 
 import (
 	"strconv"
-	"time"
 )
 
 type PropertyObject struct {
@@ -52,13 +51,13 @@ type Properties struct {
 
 	Checkbox       *bool         `json:"checkbox,omitempty"`
 	CreatedBy      *CreatedBy    `json:"created_by,omitempty"`
-	CreatedTime    *time.Time    `json:"created_time,omitempty"`
+	CreatedTime    *string       `json:"created_time,omitempty"`
 	Date           *Date         `json:"date,omitempty"`
 	Email          *string       `json:"email,omitempty"`
 	Files          []*FileObject `json:"files,omitempty"`
 	Formula        *Formula      `json:"formula,omitempty"`
 	LastEditedBy   *LastEditedBy `json:"last_edited_by,omitempty"`
-	LastEditedTime *time.Time    `json:"last_edited_time,omitempty"`
+	LastEditedTime *string       `json:"last_edited_time,omitempty"`
 	MultiSelect    []*Select     `json:"multi_select,omitempty"`
 	Number         *Number       `json:"number,omitempty"`
 	People         []*User       `json:"people,omitempty"`
@@ -69,26 +68,31 @@ type Properties struct {
 	Select         *Select       `json:"select,omitempty"`
 	Status         *Status       `json:"status,omitempty"`
 	Title          []*RichText   `json:"title,omitempty"`
-	Url            string        `json:"url,omitempty"`
+	Url            *string       `json:"url,omitempty"`
 	UniqueId       *UniqueId     `json:"unique_id,omitempty"`
 	Verification   *Verification `json:"verification,omitempty"`
 }
 
-func (p *PropertyObject) Get(name string, pType PropertiesType) interface{} {
-	return p.Properties[name].GetValue()
+func (p *PropertyObject) Get(name string) any {
+	if p.Properties[name] != nil {
+		return p.Properties[name].GetValue()
+	} else {
+		return ""
+	}
 }
 
-func (p *Properties) GetValue() interface{} {
-	layout := "2006-01-02 15:04:05"
+func (p *Properties) GetValue() any {
+	// layout := "2006-01-02 15:04:05"
 	switch p.Type {
 	case PropertyTypeCheckbox:
 		return *p.Checkbox
 	case PropertyTypeCreatedBy:
 		return p.CreatedBy.Name
 	case PropertyTypeCreatedTime:
-		return p.CreatedTime
+		return *p.CreatedTime
 	case PropertyTypeDate:
-		return p.Date.Start.Format(layout) + "~" + p.Date.End.Format(layout)
+		// return p.Date.Start.Format(layout) + "~" + p.Date.End.Format(layout)
+		return p.Date.Start + "~" + p.Date.End
 	case PropertyTypeEmail:
 		return *p.Email
 	case PropertyTypeFormula:
@@ -96,7 +100,7 @@ func (p *Properties) GetValue() interface{} {
 	case PropertyTypeLastEditedBy:
 		return p.LastEditedBy.Name
 	case PropertyTypeLastEditedTime:
-		return p.LastEditedTime
+		return *p.LastEditedTime
 	case PropertyTypeMultiSelect:
 		var selectNames []string
 		for _, slt := range p.MultiSelect {
@@ -125,7 +129,7 @@ func (p *Properties) GetValue() interface{} {
 		}
 		return content
 	case PropertyTypeUrl:
-		return p.Url
+		return *p.Url
 	case PropertyTypeUniqueId:
 		return p.UniqueId.Prefix + "_" + p.UniqueId.Number
 	case PropertyTypeVerification:
@@ -162,7 +166,8 @@ func (f Formula) GetData() string {
 			return "false"
 		}
 	case FormulaDate:
-		return f.Date.Start.Format("2006-01-02 15:04:05")
+		return f.Date.Start
+		// return f.Date.Start.Format("2006-01-02 15:04:05")
 	case FormulaNumber:
 		return strconv.Itoa(f.Number)
 	case FormulaString:

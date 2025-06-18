@@ -2,7 +2,6 @@ package filter
 
 import (
 	"encoding/json"
-	"log"
 )
 
 type FilterObjectType string
@@ -24,8 +23,23 @@ const (
 	ObjectTypeID          FilterObjectType = "ID"
 )
 
-type MetaDataValue map[FilterConditionType]interface{}
-type MetaData map[string]interface{}
+type MetaData struct {
+	Property  string
+	Type      FilterObjectType
+	Condition *MetaDataValue
+	Related   *Related
+	Value     any
+}
+
+type MetaDataValue struct {
+	Field FilterConditionType
+	Value any
+}
+
+type Related struct {
+	Logic LogicRelate
+	Value []*MetaData
+}
 
 func Checkbox(name string) *MetaData {
 	return ObjectCommon(ObjectTypeCheckbox, name)
@@ -71,41 +85,55 @@ func ID(name string) *MetaData {
 }
 
 func ObjectCommon(objType FilterObjectType, name string) *MetaData {
-	metaData := make(MetaData, 2)
-	metaData["property"] = name
-	valueInside := make(MetaDataValue)
-	metaData[string(objType)] = valueInside
+	metaData := MetaData{
+		Property: name,
+		Type:     objType,
+	}
 
 	return &metaData
 }
 
-func NewNormalFilter(key string, val interface{}) *MetaData {
-	metaData := make(MetaData)
-	metaData[key] = val
-	return &metaData
+func (meta *MetaData) Set(key string, value any) *MetaData {
+	meta.Value = map[string]any{key: value}
+
+	return meta
 }
 
-func (meta *MetaData) SetFilter() *MetaData {
-	newMeta := make(MetaData)
-	newMeta["filter"] = meta
+type filterBody map[string]any
 
-	return &newMeta
+func (meta *MetaData) MarshalJSON() ([]byte, error) {
+	return json.Marshal(meta.makeFilter())
 }
 
-func (meta *MetaData) String() string {
-	jsonData, err := json.Marshal(meta)
-	if err != nil {
-		log.Fatal("序列化出错,错误原因: ", err)
+func (meta *MetaData) makeFilter() *filterBody {
+	if meta.Value != nil {
+		return &filterBody{
+			"properties": map[string]any{
+				meta.Property: meta.Value,
+			},
+		}
 	}
 
-	return string(jsonData)
-}
-
-func (meta *MetaData) StringIndent() string {
-	jsonData, err := json.MarshalIndent(meta, "", "  ")
-	if err != nil {
-		log.Fatal("序列化出错,错误原因: ", err)
+	if meta.Related == nil || len(meta.Related.Value) == 0 {
+		return meta.makefilterBody()
 	}
 
-	return string(jsonData)
+	related := make(filterBody)
+	logic := string(meta.Related.Logic)
+	related[logic] = []*filterBody{}
+	related[logic] = append(related[logic].([]*filterBody), meta.makefilterBody())
+	for _, data := range meta.Related.Value {
+		related[logic] = append(related[logic].([]*filterBody), data.makeFilter())
+	}
+
+	return &related
+}
+
+func (meta *MetaData) makefilterBody() *filterBody {
+	return &filterBody{
+		"property": meta.Property,
+		string(meta.Type): map[string]any{
+			string(meta.Condition.Field): meta.Condition.Value,
+		},
+	}
 }

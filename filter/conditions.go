@@ -11,36 +11,30 @@ const (
 	NotContain FilterConditionType = "does_not_contain"
 )
 
-func (meta *MetaData) Equal(value interface{}) *MetaData {
+func (meta *MetaData) Equal(value any) *MetaData {
 	return meta.ConditionCommon(Equal, value)
 }
-func (meta *MetaData) NotEqual(value interface{}) *MetaData {
+func (meta *MetaData) NotEqual(value any) *MetaData {
 	return meta.ConditionCommon(NotEqual, value)
 }
-func (meta *MetaData) Empty(value interface{}) *MetaData {
+func (meta *MetaData) Empty(value any) *MetaData {
 	return meta.ConditionCommon(Empty, value)
 }
-func (meta *MetaData) NotEmpty(value interface{}) *MetaData {
+func (meta *MetaData) NotEmpty(value any) *MetaData {
 	return meta.ConditionCommon(NotEmpty, value)
 }
-func (meta *MetaData) Contain(value interface{}) *MetaData {
+func (meta *MetaData) Contain(value any) *MetaData {
 	return meta.ConditionCommon(Contain, value)
 }
-func (meta *MetaData) NotContain(value interface{}) *MetaData {
+func (meta *MetaData) NotContain(value any) *MetaData {
 	return meta.ConditionCommon(NotContain, value)
 }
 
-func (meta *MetaData) ConditionCommon(conditions FilterConditionType, value interface{}) *MetaData {
-	var objType string
-	for k, _ := range *meta {
-		if k != "property" {
-			objType = k
-		}
+func (meta *MetaData) ConditionCommon(conditions FilterConditionType, value any) *MetaData {
+	meta.Condition = &MetaDataValue{
+		Field: conditions,
+		Value: value,
 	}
-
-	valueInside := (*meta)[objType].(MetaDataValue)
-	valueInside[conditions] = value
-	(*meta)[objType] = valueInside
 
 	return meta
 }
