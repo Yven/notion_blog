@@ -108,8 +108,8 @@ func (meta *MetaData) MarshalJSON() ([]byte, error) {
 func (meta *MetaData) makeFilter() *filterBody {
 	if meta.Value != nil {
 		return &filterBody{
-			"properties": map[string]any{
-				meta.Property: meta.Value,
+			meta.Property: map[string]any{
+				string(meta.Type): meta.Value,
 			},
 		}
 	}

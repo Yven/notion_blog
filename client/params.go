@@ -1,29 +1,10 @@
 package client
 
 import (
-	"encoding/json"
 	"net/url"
 
 	"fmt"
 )
-
-type RequestParams interface {
-	String() string
-}
-
-type EmptyParams struct{}
-
-func (d *EmptyParams) String() string {
-	return ""
-}
-
-type DefaultBody struct{}
-
-func (d *DefaultBody) String() string {
-	body, _ := json.Marshal(d)
-
-	return string(body)
-}
 
 type ListParams interface {
 	Next(start string)
@@ -44,7 +25,7 @@ type BaseQuery struct {
 	PageSize    int
 }
 
-func (q *BaseQuery) String() string {
+func (q *BaseQuery) ToUrlValues() url.Values {
 	if q.PageSize == 0 {
 		q.PageSize = 100
 	}
@@ -57,7 +38,7 @@ func (q *BaseQuery) String() string {
 		query.Add("start_cursor", q.StartCursor)
 	}
 
-	return query.Encode()
+	return query
 }
 
 func (q *BaseQuery) Next(start string) {

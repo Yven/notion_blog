@@ -1,8 +1,6 @@
 package client
 
 import (
-	"encoding/json"
-
 	"github.com/Yven/notion_blog/filter"
 	"github.com/Yven/notion_blog/lib"
 	"github.com/Yven/notion_blog/structure"
@@ -27,22 +25,12 @@ type QueryDatabase struct {
 	DefaultNext
 }
 
-func (d *QueryDatabase) String() string {
-	if d.PageSize == 0 {
-		d.PageSize = 100
-	}
-
-	body, _ := json.Marshal(d)
-
-	return string(body)
-}
-
 func (db *Databases) Query(params QueryDatabase) (*structure.List, error) {
-	return db.Client.NewNotion(lib.Post, db.GetPath("query"), &params)
+	return db.Client.NewNotion(lib.Post, db.GetPath("query"), nil, params)
 }
 
 func (db *Databases) Retrieve() (*structure.List, error) {
-	return db.Client.NewNotion(lib.Get, db.GetPath(), &EmptyParams{})
+	return db.Client.NewNotion(lib.Get, db.GetPath(), nil, nil)
 }
 
 // TODO

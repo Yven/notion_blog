@@ -12,21 +12,20 @@ type Blocks struct {
 type AppendBlock struct {
 	Children []*structure.Object `json:"children"`
 	After    string              `json:"after,omitempty"`
-	DefaultBody
 }
 
 // TODO
 func (b *Blocks) Append(params AppendBlock) error {
-	_, err := b.Client.NewNotion(lib.Patch, b.GetPath("children"), &params)
+	_, err := b.Client.NewNotion(lib.Patch, b.GetPath("children"), nil, params)
 	return err
 }
 
 func (b *Blocks) Retrieve() (*structure.List, error) {
-	return b.Client.NewNotion(lib.Get, b.GetPath(), &EmptyParams{})
+	return b.Client.NewNotion(lib.Get, b.GetPath(), nil, nil)
 }
 
 func (b *Blocks) Children(parent *structure.Object, params BaseQuery) (*structure.List, error) {
-	data, err := b.Client.NewNotion(lib.Get, b.GetPath("children"), &params)
+	data, err := b.Client.NewNotion(lib.Get, b.GetPath("children"), params.ToUrlValues(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -53,6 +52,6 @@ func (b *Blocks) Children(parent *structure.Object, params BaseQuery) (*structur
 // }
 
 func (b *Blocks) Delete() error {
-	_, err := b.Client.NewNotion(lib.Delete, b.GetPath(), nil)
+	_, err := b.Client.NewNotion(lib.Delete, b.GetPath(), nil, nil)
 	return err
 }

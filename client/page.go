@@ -19,18 +19,16 @@ type CreatePage struct {
 	Children   []*structure.Object `json:"children,omitempty"`
 	Icon       string              `json:"icon,omitempty"`
 	Cover      *structure.File     `json:"cover,omitempty"`
-
-	DefaultBody
 }
 
 // TODO
 func (page *Pages) Create(params CreatePage) error {
-	_, err := page.Client.NewNotion(lib.Post, page.GetPath(true), &params)
+	_, err := page.Client.NewNotion(lib.Post, page.GetPath(true), nil, params)
 	return err
 }
 
 func (page *Pages) Retrieve() (*structure.List, error) {
-	return page.Client.NewNotion(lib.Get, page.GetPath(), &EmptyParams{})
+	return page.Client.NewNotion(lib.Get, page.GetPath(), nil, nil)
 }
 
 type UpdatePage struct {
@@ -38,11 +36,9 @@ type UpdatePage struct {
 	InTrash    bool             `json:"in_trash,omitempty"`
 	Icon       string           `json:"icon,omitempty"`
 	Cover      *structure.File  `json:"cover,omitempty"`
-
-	DefaultBody
 }
 
 func (page *Pages) Update(params UpdatePage) error {
-	_, err := page.Client.NewNotion(lib.Patch, page.GetPath(), &params)
+	_, err := page.Client.NewNotion(lib.Patch, page.GetPath(), nil, params)
 	return err
 }
