@@ -1,7 +1,7 @@
 <div align="center">
 
 # Notion Blog
-[![Build Status](https://img.shields.io/badge/notoin_blog-2.0-69cafd)](https://github.com/Yven/notion_blog)
+[![Build Status](https://img.shields.io/badge/notoin_blog-v0.0.3-69cafd)](https://github.com/Yven/notion_blog)
 
 调用Notion API获取内容，导出页面为`.md`
 
