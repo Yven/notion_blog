@@ -97,7 +97,7 @@ func (c *client) NewNotion(method lib.Method, path string, query url.Values, par
 	}
 
 	var apiURL *url.URL
-	fmt.Println("路由参数:", method, path, query, param)
+	// fmt.Println("路由参数:", method, path, query, param)
 	apiURL = &url.URL{
 		Scheme:   "https",
 		Host:     c.Host,
