@@ -3,6 +3,7 @@ package filter
 import (
 	"encoding/json"
 	"testing"
+	"time"
 )
 
 func TestFilter(t *testing.T) {
@@ -17,4 +18,8 @@ func TestFilter(t *testing.T) {
 	properties := Status("Status").Set("name", "publish")
 	data2, _ := json.MarshalIndent(properties, "", "  ")
 	t.Log(string(data2))
+
+	updateData := Date("Publish Time").Set("start", time.Now().Format("2006-01-02")).And(Status("Status").Set("name", "publish"))
+	data3, _ := json.MarshalIndent(updateData, "", "  ")
+	t.Log(string(data3))
 }

@@ -107,11 +107,20 @@ func (meta *MetaData) MarshalJSON() ([]byte, error) {
 
 func (meta *MetaData) makeFilter() *filterBody {
 	if meta.Value != nil {
-		return &filterBody{
-			meta.Property: map[string]any{
-				string(meta.Type): meta.Value,
-			},
+		list := make(filterBody)
+		if meta.Related != nil && meta.Related.Logic == AND {
+			for _, val := range meta.Related.Value {
+				list[val.Property] = map[string]any{
+					string(val.Type): val.Value,
+				}
+			}
 		}
+
+		list[meta.Property] = map[string]any{
+			string(meta.Type): meta.Value,
+		}
+
+		return &list
 	}
 
 	if meta.Related == nil || len(meta.Related.Value) == 0 {
